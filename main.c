@@ -1,11 +1,10 @@
-#include <iso646.h>
+#include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 
 #define SIZE_EXE 256
-
 
 int giveSizeTerminal(){
     FILE *fp;
@@ -69,34 +68,37 @@ int getFetchInfo(char kernel[], char package[], char shell[], int *day,char host
     *day = getUptime(&birthInstall,&currentDate);
 
     getHostname(hostname);
-    char* username = getenv("USER");
-    strcat(username, "@");
-    strcat(username,hostname);
-    strcpy(hostname, username);
 
     return 0;
 }
 
 int main(void){
-  FILE *fp;
-  int numOfCols = giveSizeTerminal();
-  char kernel[SIZE_EXE];
-  char package[SIZE_EXE];
-  char shell[SIZE_EXE];
-  char hostname[SIZE_EXE];
-  int day;
+    FILE *fp;
+    int numOfCols = giveSizeTerminal();
+    char kernel[SIZE_EXE];
+    char package[SIZE_EXE];
+    char shell[SIZE_EXE];
+    char hostname[SIZE_EXE];
+    char* username = getenv("USER");
+    int day;
+
+    getFetchInfo(kernel, package, shell, &day, hostname);
+
+    int numbKernel = 12 + strlen(kernel);
+    int numbPackage = 12 + strlen(package);
+    int numbShell = 12 + strlen(shell);
+    int numbDay = 11;
+    int numbHostname = 2 + strlen(hostname) + strlen(username);
 
 
-  getFetchInfo(kernel, package, shell, &day, hostname);
+    if (numOfCols >= (numbHostname + numbShell + numbDay + numbPackage)) printf("\033[0;32m%s\033[0;31m@\033[0;34m%s \033[0;36m|\033[0;33m ", username, hostname);
+    if (numOfCols >= (numbKernel + numbDay + numbHostname + numbPackage + numbShell)) printf("󰣇\033[0;0m Linux %s \033[0;36m|\033[0;33m ",kernel);
+    if (numOfCols >= (numbPackage + numbShell)) printf("󰏖\033[0;0m %s (pacman) \033[0;36m|\033[0;33m ",package);
+    printf("\033[0;0m %s ",shell);
+    if(numOfCols >= (numbDay +numbShell + numbPackage))printf("\033[0;36m|\033[0;33m \033[0;0m  %d day",day);
+    fflush(stdout);
 
-  printf("%s ",hostname);
-  printf("| 󰣇  Linux %s ",kernel);
-  printf("| 󰏖  %s (pacman) ",package);
-  printf("|    %s ",shell);
-  printf("|   %d day",day); fflush(stdout);
+    printf("\n");
 
-
-  printf("\n");
-
-  return 0;
+    return 0;
 }
