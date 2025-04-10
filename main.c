@@ -1,11 +1,3 @@
-/*
- * Purpose: Program to demonstrate the popen function.
- *
- * to do: Check that the 'popen' was successfull.
- *
- * Author:  M J Leslie.
- * Date:    08-Jan-94
-*/
 #include <iso646.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +17,7 @@ int giveSizeTerminal(){
 
     return num;
 }
+
 int getHostname(char hostname[]){
 
     if (gethostname(hostname, SIZE_EXE) != 0) {
@@ -40,28 +33,35 @@ int getUptime(int *birthInstall, int *currentDate){
     return timeProgression;
 }
 
+void run_command(const char *cmd, char *output, size_t size) {
+    FILE *fp = popen(cmd, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Erreur lors de l'exécution de la commande : %s\n", cmd);
+        strncpy(output, "N/A", size);
+        output[size - 1] = '\0';
+        return;
+    }
+
+    if (fgets(output, size, fp) != NULL) {
+        output[strcspn(output, "\n")] = '\0';  // Retirer le saut de ligne
+    } else {
+        strncpy(output, "N/A", size);
+        output[size - 1] = '\0';
+    }
+
+    pclose(fp);
+}
+
 int getFetchInfo(char kernel[], char package[], char shell[], int *day,char hostname[]){
-    FILE *fp;
-    fp = popen("pacman -Q | grep 'linux-hardened '", "r");
-    fgets(kernel, SIZE_EXE ,fp);
-    kernel[strcspn(kernel, "\n")] = '\0';
-
-    fp = popen("pacman -Q | wc -l", "r");
-    fgets(package, SIZE_EXE ,fp);
-    package[strcspn(package, "\n")] = '\0';
-
-    fp = popen("pacman -Q | grep 'zsh '", "r");
-    fgets(shell, SIZE_EXE ,fp);
-    shell[strcspn(shell, "\n")] = '\0';
-
     char chBirth[SIZE_EXE];
     char chCurrent[SIZE_EXE];
-    fp = popen("stat -c %W /", "r");
-    fgets(chBirth, SIZE_EXE, fp);
-    fp = popen("date +%s", "r");
-    fgets(chCurrent, SIZE_EXE, fp);
-    chBirth[strcspn(chBirth, "\n")] = '\0';
-    chCurrent[strcspn(chCurrent, "\n")] = '\0';
+
+    run_command("pacman -Q | grep 'linux-hardened '", kernel, SIZE_EXE);
+    run_command("pacman -Q | wc -l", package, SIZE_EXE);
+    run_command("pacman -Q | grep 'zsh '", shell, SIZE_EXE);
+    run_command("stat -c %W /", chBirth, SIZE_EXE);
+    run_command("date +%s", chCurrent, SIZE_EXE);
+
 
 
     int birthInstall = atoi(chBirth);
@@ -69,6 +69,10 @@ int getFetchInfo(char kernel[], char package[], char shell[], int *day,char host
     *day = getUptime(&birthInstall,&currentDate);
 
     getHostname(hostname);
+    char* username = getenv("USER");
+    strcat(username, "@");
+    strcat(username,hostname);
+    strcpy(hostname, username);
 
     return 0;
 }
@@ -80,13 +84,12 @@ int main(void){
   char package[SIZE_EXE];
   char shell[SIZE_EXE];
   char hostname[SIZE_EXE];
-  char* username = getenv("USER");
   int day;
 
 
-  getFetchInfo(kernel, package, shell, &day,hostname);
+  getFetchInfo(kernel, package, shell, &day, hostname);
 
-  printf("%s@%s ", username, hostname);
+  printf("%s ",hostname);
   printf("| 󰣇  Linux %s ",kernel);
   printf("| 󰏖  %s (pacman) ",package);
   printf("|    %s ",shell);
