@@ -43,7 +43,7 @@ void run_command(const char *cmd, char *output, size_t size) {
     }
 
     if (fgets(output, size, fp) != NULL) {
-        output[strcspn(output, "\n")] = '\0';  // Retirer le saut de ligne
+        output[strcspn(output, "\n")] = '\0';
     } else {
         strncpy(output, "N/A", size);
         output[size - 1] = '\0';
