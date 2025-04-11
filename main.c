@@ -82,6 +82,8 @@ int main(void){
 
     getFetchInfo(kernel, package, shell, &day, hostname);
 
+
+    // The constant is the number of char who never change (basicly number of char hard write on the printf)
     int numbKernel = 12 + strlen(kernel);
     int numbPackage = 12 + strlen(package);
     int numbShell = 12 + strlen(shell);
