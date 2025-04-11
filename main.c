@@ -1,20 +1,18 @@
+#include <asm-generic/ioctls.h>
 #include <linux/limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 #include <string.h>
 
 #define SIZE_EXE 256
 
 int giveSizeTerminal(){
-    FILE *fp;
-    char col[64];
+    struct winsize w;
 
-    fp = popen("tput cols", "r");
-    fgets( col, sizeof col, fp);
-    int num = atoi(col);
-
-    return num;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    return w.ws_col;
 }
 
 int getHostname(char hostname[]){
