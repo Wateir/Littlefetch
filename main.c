@@ -30,6 +30,15 @@ int getUptime(int *birthInstall, int *currentDate){
     return timeProgression;
 }
 
+char* cutAfterSpace(const char str[], char result[]) {
+    char* space_ptr = strchr(str, ' ');
+    const char* after_space = space_ptr + 1;
+
+    strcpy(result, after_space);
+    return result;
+}
+
+
 void run_command(const char *cmd, char *output, size_t size) {
     FILE *fp = popen(cmd, "r");
     if (fp == NULL) {
@@ -52,14 +61,15 @@ void run_command(const char *cmd, char *output, size_t size) {
 int getFetchInfo(char kernel[], char package[], char shell[], int *day,char hostname[]){
     char chBirth[SIZE_EXE];
     char chCurrent[SIZE_EXE];
+    char chKernel[SIZE_EXE];
 
-    run_command("pacman -Q | grep 'linux-hardened '", kernel, SIZE_EXE);
+    run_command("pacman -Q | grep 'linux-hardened '", chKernel, SIZE_EXE);
     run_command("pacman -Q | wc -l", package, SIZE_EXE);
     run_command("pacman -Q | grep 'zsh '", shell, SIZE_EXE);
     run_command("stat -c %W /", chBirth, SIZE_EXE);
     run_command("date +%s", chCurrent, SIZE_EXE);
 
-
+    cutAfterSpace(chKernel, kernel);
 
     int birthInstall = atoi(chBirth);
     int currentDate = atoi(chCurrent);
