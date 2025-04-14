@@ -42,7 +42,7 @@ char* cutAfterSpace(const char str[], char result[]) {
 void run_command(const char *cmd, char *output, size_t size) {
     FILE *fp = popen(cmd, "r");
     if (fp == NULL) {
-        fprintf(stderr, "Erreur lors de l'exécution de la commande : %s\n", cmd);
+        fprintf(stderr, "Error can't run : %s\n", cmd);
         strncpy(output, "N/A", size);
         output[size - 1] = '\0';
         return;
@@ -101,10 +101,10 @@ int main(void){
     int numbHostname = 2 + strlen(hostname) + strlen(username);
 
 
-    if (numOfCols >= (numbHostname + numbShell + numbDay + numbPackage)) printf("\033[0;32m%s\033[0;31m@\033[0;34m%s \033[0;36m|\033[0;33m ", username, hostname);
-    if (numOfCols >= (numbKernel + numbDay + numbHostname + numbPackage + numbShell)) printf("󰣇\033[0;0m Linux %s \033[0;36m|\033[0;33m ",kernel);
-    if (numOfCols >= (numbPackage + numbShell)) printf("󰏖\033[0;0m %s (pacman) \033[0;36m|\033[0;33m ",package);
-    printf("\033[0;0m %s ",shell);
+    if (numOfCols >= (numbHostname + numbShell + numbDay + numbPackage)) printf(" \033[0;32m%s\033[0;31m@\033[0;34m%s \033[0;36m|\033[0;33m", username, hostname);
+    if (numOfCols >= (numbKernel + numbDay + numbHostname + numbPackage + numbShell)) printf(" 󰣇\033[0;0m Linux %s \033[0;36m|\033[0;33m",kernel);
+    if (numOfCols >= (numbPackage + numbShell)) printf(" 󰏖\033[0;0m %s (pacman) \033[0;36m|\033[0;33m",package);
+    printf(" \033[0;0m %s ",shell);
     if(numOfCols >= (numbDay +numbShell + numbPackage))printf("\033[0;36m|\033[0;33m \033[0;0m  %d day",day);
     fflush(stdout);
 
