@@ -44,47 +44,32 @@ time_t getUptime(){
     return diff;
 }
 
-char* cutAfterSpace(const char str[], char result[]) {
-    char* space_ptr = strchr(str, ' ');
-    const char* after_space = space_ptr + 1;
-
-    strcpy(result, after_space);
-    return result;
-}
-
-
-void run_command(const char *cmd, char *output, size_t size) {
-    FILE *fp = popen(cmd, "r");
-    if (fp == NULL) {
-        fprintf(stderr, "Error can't run : %s\n", cmd);
-        strncpy(output, "N/A", size);
-        output[size - 1] = '\0';
-        return;
-    }
-
-    if (fgets(output, size, fp) != NULL) {
-        output[strcspn(output, "\n")] = '\0';
-    } else {
-        strncpy(output, "N/A", size);
-        output[size - 1] = '\0';
-    }
-
-    pclose(fp);
-}
-
 int getFetchInfo(char kernel[], char package[], char shell[], time_t *day,char hostname[]){
-    char chKernel[SIZE_EXE];
+    alpm_handle_t *handle;
+    alpm_db_t *localdb;
+    alpm_pkg_t *pkg;
+    alpm_list_t *pkgcache;
+    struct utsname buffer;
+    const char *shell_path = getenv("SHELL");
 
-    run_command("pacman -Q | grep 'linux-hardened '", chKernel, SIZE_EXE);
-    run_command("pacman -Q | wc -l", package, SIZE_EXE);
-    run_command("pacman -Q | grep 'zsh '", shell, SIZE_EXE);
+    handle = alpm_initialize("/", "/var/lib/pacman", NULL);
+    localdb = alpm_get_localdb(handle);
+    pkgcache = alpm_db_get_pkgcache(localdb);
 
-    cutAfterSpace(chKernel, kernel);
+    sprintf(package,"%d",(int)alpm_list_count(pkgcache));
+    uname(&buffer);
+    strcat(kernel,buffer.release);
+
+    char *shell_copy = strdup(shell_path);
+    pkg = alpm_db_get_pkg(localdb, basename(shell_copy));
+    strcat(shell,(char *) alpm_pkg_get_name(pkg));
+    strcat(shell," ");
+    strcat(shell,(char *) alpm_pkg_get_version(pkg));
 
     *day = getUptime();
-
     getHostname(hostname);
 
+    free(shell_copy);
     return 0;
 }
 
@@ -98,7 +83,6 @@ int main(void){
     time_t day;
 
     getFetchInfo(kernel, package, shell, &day, hostname);
-
 
     // The constant is the number of char who never change (basicly number of char hard write on the printf)
     int numbKernel = 12 + strlen(kernel);
