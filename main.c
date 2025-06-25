@@ -1,12 +1,19 @@
-#include <asm-generic/ioctls.h>
-#include <linux/limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-#include <string.h>
-
+#define _GNU_SOURCE
 #define SIZE_EXE 256
+
+#include <stdio.h>
+#include <string.h>
+#include <alpm.h>
+#include <libgen.h>
+#include <time.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/utsname.h>
+#include <sys/ioctl.h>
+#include <asm-generic/ioctls.h>
+#include <linux/stat.h>
 
 int giveSizeTerminal(){
     struct winsize w;
@@ -24,10 +31,17 @@ int getHostname(char hostname[]){
     return 0;
 }
 
-int getUptime(int *birthInstall, int *currentDate){
-    int timeProgression = *currentDate - *birthInstall;
-    timeProgression = timeProgression / 86400;
-    return timeProgression;
+time_t getUptime(){
+    time_t current, birth, diff;
+    struct statx stats;
+
+    statx(AT_FDCWD, "/", AT_SYMLINK_NOFOLLOW, STATX_BTIME, &stats);
+
+    current = time(NULL);
+    birth = (time_t) stats.stx_btime.tv_sec;
+    diff = difftime(current, birth) / 86400;
+
+    return diff;
 }
 
 char* cutAfterSpace(const char str[], char result[]) {
@@ -58,7 +72,7 @@ void run_command(const char *cmd, char *output, size_t size) {
     pclose(fp);
 }
 
-int getFetchInfo(char kernel[], char package[], char shell[], int *day,char hostname[]){
+int getFetchInfo(char kernel[], char package[], char shell[], time_t *day,char hostname[]){
     char chBirth[SIZE_EXE];
     char chCurrent[SIZE_EXE];
     char chKernel[SIZE_EXE];
@@ -71,9 +85,7 @@ int getFetchInfo(char kernel[], char package[], char shell[], int *day,char host
 
     cutAfterSpace(chKernel, kernel);
 
-    int birthInstall = atoi(chBirth);
-    int currentDate = atoi(chCurrent);
-    *day = getUptime(&birthInstall,&currentDate);
+    *day = getUptime();
 
     getHostname(hostname);
 
@@ -81,14 +93,13 @@ int getFetchInfo(char kernel[], char package[], char shell[], int *day,char host
 }
 
 int main(void){
-    FILE *fp;
     int numOfCols = giveSizeTerminal();
     char kernel[SIZE_EXE];
     char package[SIZE_EXE];
     char shell[SIZE_EXE];
     char hostname[SIZE_EXE];
     char* username = getenv("USER");
-    int day;
+    time_t day;
 
     getFetchInfo(kernel, package, shell, &day, hostname);
 
@@ -105,10 +116,25 @@ int main(void){
     if (numOfCols >= (numbKernel + numbDay + numbHostname + numbPackage + numbShell)) printf(" 󰣇\033[0;0m Linux %s \033[0;36m|\033[0;33m",kernel);
     if (numOfCols >= (numbPackage + numbShell)) printf(" 󰏖\033[0;0m %s (pacman) \033[0;36m|\033[0;33m",package);
     printf(" \033[0;0m %s ",shell);
-    if(numOfCols >= (numbDay +numbShell + numbPackage))printf("\033[0;36m|\033[0;33m \033[0;0m  %d day",day);
+    if(numOfCols >= (numbDay +numbShell + numbPackage))printf("\033[0;36m|\033[0;33m \033[0;0m  %ld day",day);
     fflush(stdout);
 
     printf("\n");
+
+
+    alpm_handle_t *handle;
+    alpm_db_t *localdb;
+    alpm_pkg_t *pkg;
+
+    handle = alpm_initialize("/", "/var/lib/pacman", NULL);
+    localdb = alpm_get_localdb(handle);
+    pkg = alpm_db_get_pkg(localdb, "linux");
+
+    if (pkg) {
+        printf("Version: %s\n", alpm_pkg_get_version(pkg));
+    }
+
+    alpm_release(handle);
 
     return 0;
 }
