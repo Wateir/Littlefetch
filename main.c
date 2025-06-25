@@ -73,15 +73,11 @@ void run_command(const char *cmd, char *output, size_t size) {
 }
 
 int getFetchInfo(char kernel[], char package[], char shell[], time_t *day,char hostname[]){
-    char chBirth[SIZE_EXE];
-    char chCurrent[SIZE_EXE];
     char chKernel[SIZE_EXE];
 
     run_command("pacman -Q | grep 'linux-hardened '", chKernel, SIZE_EXE);
     run_command("pacman -Q | wc -l", package, SIZE_EXE);
     run_command("pacman -Q | grep 'zsh '", shell, SIZE_EXE);
-    run_command("stat -c %W /", chBirth, SIZE_EXE);
-    run_command("date +%s", chCurrent, SIZE_EXE);
 
     cutAfterSpace(chKernel, kernel);
 
@@ -120,21 +116,5 @@ int main(void){
     fflush(stdout);
 
     printf("\n");
-
-
-    alpm_handle_t *handle;
-    alpm_db_t *localdb;
-    alpm_pkg_t *pkg;
-
-    handle = alpm_initialize("/", "/var/lib/pacman", NULL);
-    localdb = alpm_get_localdb(handle);
-    pkg = alpm_db_get_pkg(localdb, "linux");
-
-    if (pkg) {
-        printf("Version: %s\n", alpm_pkg_get_version(pkg));
-    }
-
-    alpm_release(handle);
-
     return 0;
 }
