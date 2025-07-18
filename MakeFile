@@ -1,8 +1,0 @@
-.PHONY: build install
-
-build:
-	gcc -o ltfetch main.c -Wall -Wextra -lalpm
-
-install: build
-	mkdir -p ${HOME}/.local/bin
-	cp ltfetch ${HOME}/.local/bin/
