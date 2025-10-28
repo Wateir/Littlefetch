@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra
 LDFLAGS = -lalpm
 BIN_DIR = ${HOME}/.local/bin
-TARGET = ltfetch
+TARGET = prog
 SRC = main.c
 
 .PHONY: all build install clean

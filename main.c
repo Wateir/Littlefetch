@@ -1,5 +1,4 @@
 #define _GNU_SOURCE
-#define SIZE_EXE 256
 
 #include <stdio.h>
 #include <string.h>
@@ -13,7 +12,8 @@
 #include <sys/utsname.h>
 #include <sys/ioctl.h>
 #include <asm-generic/ioctls.h>
-#include <linux/stat.h>
+
+#define SIZE_EXE 256
 
 int giveSizeTerminal(){
     struct winsize w;
