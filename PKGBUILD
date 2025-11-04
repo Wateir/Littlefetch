@@ -11,6 +11,7 @@ provides=('LittleFetch')
 depends=("git" "fzf" "pacman")
 makedepends=("git")
 source=("git+https://github.com/Wateir/LittleFetch.git")
+packager="wateir <contact@wateir.fr>"
 sha256sums=('SKIP')
 
 pkgver() {
