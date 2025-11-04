@@ -28,5 +28,5 @@ Uninstall
 This fetch can work normaly on any machine who have pacman.
 
 This is not test to Arch Derivate.
-This is not intended for other than machine.
+This is not intended for other than mine machine.
 You can still open a issue if you find something wrong.
