@@ -27,7 +27,6 @@ build() {
 package() {
   cd "$srcdir/LittleFetch"
 
-  # Ensure old version is not left over
   if [ -e "$pkgdir/usr/bin/LittleFetch" ]; then
     rm "$pkgdir/usr/bin/LittleFetch"
   fi
