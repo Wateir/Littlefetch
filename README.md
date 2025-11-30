@@ -9,15 +9,15 @@ Expect render
 ### Building
 To build the tool, simply execute this command sequence:
 ```bash
-git clone https://github.com/Wateir/Littlefetch && cd LittleFetch
+git clone https://github.com/Wateir/Littlefetch && cd Littlefetch
 make build
 ```
 #### Arch Linux
 Installation
 ```bash
-git clone https://github.com/Wateir/Littlefetch && cd LittleFetch
+git clone https://github.com/Wateir/Littlefetch && cd Littlefetch
 makepkg -si --cleanbuild
-cd .. && rm -fr LittleFetch
+cd .. && rm -fr Littlefetch
 ```
 Uninstall 
 ```bash
