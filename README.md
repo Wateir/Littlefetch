@@ -2,24 +2,24 @@
 
 A one liner fetch to display the maximun usefull information that the windows allow
 
-Expect render
+Expect render : 
 ![image](https://github.com/user-attachments/assets/80d16ccc-3b79-476a-9cf7-b716372a3ab5)
 
 
 ### Building
 To build the tool, simply execute this command sequence:
 ```bash
-git clone https://github.com/Wateir/Littlefetch && cd LittleFetch
+git clone https://github.com/Wateir/Littlefetch && cd Littlefetch
 make build
 ```
 #### Arch Linux
-Installation
+Installation : 
 ```bash
-git clone https://github.com/Wateir/Littlefetch && cd LittleFetch
+git clone https://github.com/Wateir/Littlefetch && cd Littlefetch
 makepkg -si --cleanbuild
-cd .. && rm -fr LittleFetch
+cd .. && rm -fr Littlefetch
 ```
-Uninstall 
+Uninstall : 
 ```bash
 # pacman -R LittleFetch-git
 ```
